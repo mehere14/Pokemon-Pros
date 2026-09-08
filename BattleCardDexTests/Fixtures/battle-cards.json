@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    { "id": "sample-alpha-001", "creatureID": 1, "name": "Seedling One", "setName": "Field Notes", "number": "001", "rarity": "standard" },
+    { "id": "sample-alpha-014", "creatureID": 3, "name": "Seedling Three", "setName": "Field Notes", "number": "014", "rarity": "illustrated" },
+    { "id": "sample-beta-p06", "creatureID": 6, "name": "Ember Three", "setName": "Arena Selection", "number": "P06", "rarity": "promotional" }
+  ]
+}

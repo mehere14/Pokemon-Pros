@@ -1,8 +1,29 @@
 # Battle Card Dex — Version 2 Sequential Task List
 
-**Status:** Draft for review  
-**Updated:** September 4, 2026  
+**Status:** First-30 Development catalog seeded; live catalog validation, device/simulator, acceptance, and release gates pending  
+**Updated:** September 6, 2026  
 **Companion plan:** `Plan/version-2-plan.md`
+
+## Current Handoff — September 6, 2026
+
+### Connected-iPad verification — September 6, 2026
+
+- A signed Debug build was built, installed, and launched on the connected iPad Air 11-inch (M3) running iPadOS 26.5.2. No simulator was used.
+- The Development public CloudKit probe succeeded for `CatalogManifest/catalog-manifest-v1` at revision `1788660092`.
+- The initial app launch exposed `CloudCatalogRecordError.malformedPayload` for `catalog-creature-1`: persisted-payload text validation incorrectly treated provider/CDN HTTPS URLs as user-visible prose and rejected the artwork URL when its path contained restricted branding.
+- Persisted-payload validation now permits transport identifiers only in explicitly named HTTPS `*URL` fields; all user-visible strings and keys still pass the neutral-text sanitizer. Catalog load diagnostics now report local/public boundaries and exact decode failures instead of silently collapsing them into `emptyInstall`.
+- The fixed app loaded 31 primary records and 1,052 related records from Development with zero misses, then repeated the same ready state on a warm launch. The complete `BattleCardDexTests` target passed 55 tests on the connected iPad, including the new transport-URL regression.
+- The verified build is installed and left open on the connected iPad. Signed-out public-read and client mutation-denial verification remain pending; Development `_icloud` write permission was not changed.
+
+- Loader implementation is live for range-based `seed`/`sync`; `sync --all` remains intentionally gated for Task 29.
+- Development contains the four catalog record types and all 32 required indexes. Production was not changed.
+- `seed --range 1...30` succeeded with 30 creatures, 12 unique evolution records, and 1,040 related cards. It wrote 1,052 records and skipped 30 records already created by the index-1 probe.
+- The unchanged first-30 rerun succeeded with 1,082 skips and zero writes. The manifest checkpoint is committed.
+- Successful provider responses are stored in the gitignored `.loader-cache/` snapshot (523 files at completion), and cache hits bypass the provider rate limiter and network.
+- Local CloudKit configuration is read directly from gitignored `.env.local` (mode `0600`); the private PEM remains outside the repository. The loader runtime does not query Keychain.
+- Development `_world` remains read-only. Authenticated Development (`_icloud`) Create/Write remains enabled for all four catalog types at the user's direction so later loader runs can add the remaining catalog. This means an authenticated Development app client is not currently write-denied; do not mark the Task 9 security exit criterion until the final role model and client-mutation probe pass.
+- `cd Loader && swift test` passes 22 tests. Terminology compliance and `git diff --check` pass.
+- Next work: finish Task 14 live `validate`, actual CloudKit query counts, relationship checks, and footprint report. For Task 9, the signed-in read is complete; the signed-out read and later mutation-denial probe remain. Continue physical-device runtime UI work on the connected iPad.
 
 **Progress notation:** `[ ]` means pending and `[x]` means implemented and verified. Agents must update this file in place, preserve completed marks, and check an exit criterion only after every Work and Tests item in that task is complete.
 
@@ -24,20 +45,20 @@
 
 **Work**
 
-- [ ] Record the current Xcode/Swift versions, deployment targets, supported devices, schemes, signing state, entitlements, bundle IDs, and existing warnings.
-- [ ] Add documented, non-interactive commands for building the app, running unit tests, and running UI tests on a named simulator.
-- [ ] Record current tracked and untracked files so later agents do not overwrite user-owned material.
-- [ ] Confirm the mockup and design document are reference-only and excluded from all app target memberships.
+- [x] Record the current Xcode/Swift versions, deployment targets, supported devices, schemes, signing state, entitlements, bundle IDs, and existing warnings.
+- [x] Add documented, non-interactive commands for building the app, running unit tests, and running UI tests on a named simulator.
+- [x] Record current tracked and untracked files so later agents do not overwrite user-owned material.
+- [x] Confirm the mockup and design document are reference-only and excluded from all app target memberships.
 
 **Tests**
 
-- [ ] Run a clean simulator build of the untouched starter target.
-- [ ] Run the starter unit and UI test suites.
-- [ ] Inspect the built application bundle and confirm no `Design Mockup/` or `Plan/` files are embedded.
+- [x] Run a clean simulator build of the untouched starter target.
+- [x] Run the starter unit and UI test suites.
+- [x] Inspect the built application bundle and confirm no `Design Mockup/` or `Plan/` files are embedded.
 
 **Exit criterion**
 
-- [ ] Baseline results and exact verification commands are documented; any pre-existing failure is isolated and explained.
+- [x] Baseline results and exact verification commands are documented; any pre-existing failure is isolated and explained.
 
 ### Task 2 — Rename the Shipping Product to Battle Card Dex
 
@@ -45,24 +66,24 @@
 
 **Work**
 
-- [ ] Rename the Xcode project, app target, unit-test target, UI-test target, schemes, product, executable, source directory, app entry point, and test classes.
-- [ ] Set the display name to `Battle Card Dex`.
-- [ ] Set the app bundle ID to `com.askcruit.Battle-Card-Dex` and matching neutral IDs for test targets.
-- [ ] Rename the CloudKit container reference to `iCloud.com.askcruit.Battle-Card-Dex`.
-- [ ] Replace authored UI strings, accessibility labels, logs, symbols, comments, filenames, and asset names with neutral terminology.
-- [ ] Do not modify the non-shipping design references except to ensure they have no target membership.
+- [x] Rename the Xcode project, app target, unit-test target, UI-test target, schemes, product, executable, source directory, app entry point, and test classes.
+- [x] Set the display name to `Battle Card Dex`.
+- [x] Set the app bundle ID to `com.askcruit.Battle-Card-Dex` and matching neutral IDs for test targets.
+- [x] Rename the CloudKit container reference to `iCloud.com.askcruit.Battle-Card-Dex`.
+- [x] Replace authored UI strings, accessibility labels, logs, symbols, comments, filenames, and asset names with neutral terminology.
+- [x] Do not modify the non-shipping design references except to ensure they have no target membership.
 
 **Tests**
 
-- [ ] Build and launch the renamed app from the renamed shared scheme.
-- [ ] Confirm the home-screen/app-process name and bundle metadata say `Battle Card Dex`.
-- [ ] Search every shipping source and project-metadata file for the banned franchise token and accented spelling.
-- [ ] Run `strings` against the built executable and scan the complete `.app` bundle for the same terms.
-- [ ] Confirm the design-reference directories are absent from the archive.
+- [x] Build and launch the renamed app from the renamed shared scheme.
+- [x] Confirm the home-screen/app-process name and bundle metadata say `Battle Card Dex`.
+- [x] Search every shipping source and project-metadata file for the banned franchise token and accented spelling.
+- [x] Run `strings` against the built executable and scan the complete `.app` bundle for the same terms.
+- [x] Confirm the design-reference directories are absent from the archive.
 
 **Exit criterion**
 
-- [ ] The renamed app and both test bundles compile, launch, and pass the shipping terminology scan.
+- [x] The renamed app and both test bundles compile, launch, and pass the shipping terminology scan.
 
 ### Task 3 — Add a Permanent Terminology Compliance Gate
 
@@ -70,21 +91,21 @@
 
 **Work**
 
-- [ ] Add a release-validation script that constructs banned terms from Unicode scalar values so the scanner itself does not contain the literal text.
-- [ ] Scan Swift, Objective-C, plist, entitlement, project, scheme, localization, asset, JSON fixture, generated bundle, and executable-string inputs.
-- [ ] Exclude only the non-shipping `Plan/` and design-reference directories.
-- [ ] Run the gate before archive/release builds and expose it as a standalone verification command.
+- [x] Add a release-validation script that constructs banned terms from Unicode scalar values so the scanner itself does not contain the literal text.
+- [x] Scan Swift, Objective-C, plist, entitlement, project, scheme, localization, asset, JSON fixture, generated bundle, and executable-string inputs.
+- [x] Exclude only the non-shipping `Plan/` and design-reference directories.
+- [x] Run the gate before archive/release builds and expose it as a standalone verification command.
 
 **Tests**
 
-- [ ] Add a temporary prohibited string in a disposable test fixture and verify the gate fails with its exact file and line.
-- [ ] Remove the temporary string and verify the gate passes.
-- [ ] Verify both accented and unaccented forms are detected case-insensitively.
-- [ ] Verify neutral words containing unrelated partial character sequences do not cause false positives.
+- [x] Add a temporary prohibited string in a disposable test fixture and verify the gate fails with its exact file and line.
+- [x] Remove the temporary string and verify the gate passes.
+- [x] Verify both accented and unaccented forms are detected case-insensitively.
+- [x] Verify neutral words containing unrelated partial character sequences do not cause false positives.
 
 **Exit criterion**
 
-- [ ] A failing terminology scan blocks release validation, and the clean renamed project passes.
+- [x] A failing terminology scan blocks release validation, and the clean renamed project passes.
 
 ### Task 4 — Define Build Environments and Central Configuration
 
@@ -92,21 +113,21 @@
 
 **Work**
 
-- [ ] Add typed `AppConfiguration`, `CloudCatalogConfiguration`, `CacheConfiguration`, `InteractionConstants`, `MotionConstants`, and `DesignConstants` sources.
-- [ ] Define Debug, Test, and Release behavior without scattering compiler checks through feature code.
-- [ ] Centralize CloudKit container ID, record names, schema version, manifest ID, timeouts, batch sizes, cache budgets, first-seed range, locale, and feature flags.
-- [ ] Ensure upstream API hosts and credentials exist only in the separate loader environment, never in the shipping app target.
-- [ ] Define a test configuration that uses in-memory stores and fake CloudKit services.
+- [x] Add typed `AppConfiguration`, `CloudCatalogConfiguration`, `CacheConfiguration`, `InteractionConstants`, `MotionConstants`, and `DesignConstants` sources.
+- [x] Define Debug, Test, and Release behavior without scattering compiler checks through feature code.
+- [x] Centralize CloudKit container ID, record names, schema version, manifest ID, timeouts, batch sizes, cache budgets, first-seed range, locale, and feature flags.
+- [x] Ensure upstream API hosts and credentials exist only in the separate loader environment, never in the shipping app target.
+- [x] Define a test configuration that uses in-memory stores and fake CloudKit services.
 
 **Tests**
 
-- [ ] Unit-test every environment’s expected configuration values.
-- [ ] Inspect the Release app binary and verify loader hosts, API keys, and private-key paths are absent.
-- [ ] Verify invalid cache sizes, negative timeouts, and unsupported schema versions fail configuration validation.
+- [x] Unit-test every environment’s expected configuration values.
+- [x] Inspect the Release app binary and verify loader hosts, API keys, and private-key paths are absent.
+- [x] Verify invalid cache sizes, negative timeouts, and unsupported schema versions fail configuration validation.
 
 **Exit criterion**
 
-- [ ] All static configuration has one typed source of truth and Release contains no loader secrets or upstream endpoints.
+- [x] All static configuration has one typed source of truth and Release contains no loader secrets or upstream endpoints.
 
 ### Task 5 — Build the Test Harness and Deterministic Fixtures
 
@@ -114,20 +135,20 @@
 
 **Work**
 
-- [ ] Create protocol fakes for the public catalog store, local catalog store, image loader, clock, and retry scheduler.
-- [ ] Add sanitized deterministic fixtures for creature indexes 1–6, one branching evolution, one no-evolution case, and representative battle cards.
-- [ ] Keep raw upstream fixtures outside the shipping app target; normalize and sanitize fixture content before committing it.
-- [ ] Add helpers for in-memory SwiftData containers and isolated CloudKit development record namespaces.
+- [x] Create protocol fakes for the public catalog store, local catalog store, image loader, clock, and retry scheduler.
+- [x] Add sanitized deterministic fixtures for creature indexes 1–6, one branching evolution, one no-evolution case, and representative battle cards.
+- [x] Keep raw upstream fixtures outside the shipping app target; normalize and sanitize fixture content before committing it.
+- [x] Add helpers for in-memory SwiftData containers and isolated CloudKit development record namespaces.
 
 **Tests**
 
-- [ ] Verify fixtures decode deterministically and contain no prohibited authored/runtime text.
-- [ ] Verify fake services can emit success, empty, stale, offline, throttle, partial-failure, and cancellation states.
-- [ ] Verify each test starts with an empty isolated local store and cannot access Production CloudKit.
+- [x] Verify fixtures decode deterministically and contain no prohibited authored/runtime text.
+- [x] Verify fake services can emit success, empty, stale, offline, throttle, partial-failure, and cancellation states.
+- [x] Verify each test starts with an empty isolated local store and cannot access Production CloudKit.
 
 **Exit criterion**
 
-- [ ] Subsequent data and UI tasks can run deterministically without external network access.
+- [x] Subsequent data and UI tasks can run deterministically without external network access.
 
 ## Phase B — Build the Data Contracts and Storage
 
@@ -137,23 +158,23 @@
 
 **Work**
 
-- [ ] Define immutable domain models for `CreatureSummary`, `CreatureProfile`, `CreatureForm`, `CreatureStats`, `MoveSummary`, `MoveDetail`, `Encounter`, `EvolutionChain`, `EvolutionNode`, `EvolutionRequirement`, `BattleCardSummary`, and `BattleCardDetail`.
-- [ ] Define loader-only DTOs—Data Transfer Objects—that mirror external JSON, then map them into normalized catalog payloads.
-- [ ] Keep DTOs, CloudKit records, SwiftData models, domain models, and view state as separate types.
-- [ ] Normalize measurements, optional fields, names, IDs, version groups, types, and evolution conditions.
-- [ ] Add a sanitizer that rewrites prohibited generic branding into neutral factual wording or omits unsafe descriptions.
+- [x] Define immutable domain models for `CreatureSummary`, `CreatureProfile`, `CreatureForm`, `CreatureStats`, `MoveSummary`, `MoveDetail`, `Encounter`, `EvolutionChain`, `EvolutionNode`, `EvolutionRequirement`, `BattleCardSummary`, and `BattleCardDetail`.
+- [x] Define loader-only DTOs—Data Transfer Objects—that mirror external JSON, then map them into normalized catalog payloads.
+- [x] Keep DTOs, CloudKit records, SwiftData models, domain models, and view state as separate types.
+- [x] Normalize measurements, optional fields, names, IDs, version groups, types, and evolution conditions.
+- [x] Add a sanitizer that rewrites prohibited generic branding into neutral factual wording or omits unsafe descriptions.
 
 **Tests**
 
-- [ ] Decode sanitized fixtures with missing, null, extra, and unknown fields.
-- [ ] Verify DTO-to-catalog and catalog-to-domain mappings.
-- [ ] Verify every evolution condition maps correctly, including branching and multiple simultaneous requirements.
-- [ ] Verify sanitizer behavior for case, accents, punctuation, and embedded phrases.
-- [ ] Verify no raw upstream payload is accepted as a persisted catalog payload.
+- [x] Decode sanitized fixtures with missing, null, extra, and unknown fields.
+- [x] Verify DTO-to-catalog and catalog-to-domain mappings.
+- [x] Verify every evolution condition maps correctly, including branching and multiple simultaneous requirements.
+- [x] Verify sanitizer behavior for case, accents, punctuation, and embedded phrases.
+- [x] Verify no raw upstream payload is accepted as a persisted catalog payload.
 
 **Exit criterion**
 
-- [ ] Stable domain contracts exist, mapping tests pass, and prohibited text cannot enter a published payload.
+- [x] Stable domain contracts exist, mapping tests pass, and prohibited text cannot enter a published payload.
 
 ### Task 7 — Implement the Local SwiftData Catalog Mirror
 
@@ -161,24 +182,24 @@
 
 **Work**
 
-- [ ] Remove the starter `Item` model.
-- [ ] Add `CachedCatalogManifest`, `CachedCreature`, `CachedEvolutionChain`, and `CachedCard`.
-- [ ] Configure this model container with `cloudKitDatabase: .none`.
-- [ ] Add local indexes/uniqueness where safe, stable source-ID upserts, content hashes, schema versions, cache timestamps, and encoded normalized payloads.
-- [ ] Implement transactional batch replacement and last-valid-record retention.
-- [ ] Provide queries for index ordering, name/number search, generation/type filtering, evolution lookup, and cards related to a creature.
+- [x] Remove the starter `Item` model.
+- [x] Add `CachedCatalogManifest`, `CachedCreature`, `CachedEvolutionChain`, and `CachedCard`.
+- [x] Configure this model container with `cloudKitDatabase: .none`.
+- [x] Add local indexes/uniqueness where safe, stable source-ID upserts, content hashes, schema versions, cache timestamps, and encoded normalized payloads.
+- [x] Implement transactional batch replacement and last-valid-record retention.
+- [x] Provide queries for index ordering, name/number search, generation/type filtering, evolution lookup, and cards related to a creature.
 
 **Tests**
 
-- [ ] Create the model container in memory and on disk.
-- [ ] Insert, update, skip unchanged, query, and delete all model types.
-- [ ] Verify duplicate source IDs resolve predictably.
-- [ ] Simulate a failed batch and confirm previous valid rows remain.
-- [ ] Delete the local store and verify it can be recreated empty without migration errors.
+- [x] Create the model container in memory and on disk.
+- [x] Insert, update, skip unchanged, query, and delete all model types.
+- [x] Verify duplicate source IDs resolve predictably.
+- [x] Simulate a failed batch and confirm previous valid rows remain.
+- [x] Delete the local store and verify it can be recreated empty without migration errors.
 
 **Exit criterion**
 
-- [ ] The device cache is fully usable without CloudKit and all persistence tests pass.
+- [x] The device cache is fully usable without CloudKit and all persistence tests pass.
 
 ### Task 8 — Define the Public CloudKit Record Schema
 
@@ -186,22 +207,22 @@
 
 **Work**
 
-- [ ] Define record codecs for `CatalogManifest`, `CreatureCatalogRecord`, `EvolutionCatalogRecord`, and `CardCatalogRecord`.
-- [ ] Use deterministic record names, content hashes, loader timestamps, source timestamps where available, and explicit schema versions.
-- [ ] Keep structured payloads below the 1 MB CloudKit record limit.
-- [ ] Define required queryable/sortable fields and document the indexes that must be enabled in CloudKit Console.
-- [ ] Keep images as source URLs in this phase; do not create `CKAsset` artwork records.
+- [x] Define record codecs for `CatalogManifest`, `CreatureCatalogRecord`, `EvolutionCatalogRecord`, and `CardCatalogRecord`.
+- [x] Use deterministic record names, content hashes, loader timestamps, source timestamps where available, and explicit schema versions.
+- [x] Keep structured payloads below the 1 MB CloudKit record limit.
+- [x] Define required queryable/sortable fields and document the indexes that must be enabled in CloudKit Console.
+- [x] Keep images as source URLs in this phase; do not create `CKAsset` artwork records.
 
 **Tests**
 
-- [ ] Round-trip every record type between normalized models and fake `CKRecord` values.
-- [ ] Reject missing required fields, wrong types, unsupported schema versions, oversized payloads, and invalid IDs.
-- [ ] Verify deterministic record-name generation for repeated inputs.
-- [ ] Verify records and field names use only neutral internal terminology.
+- [x] Round-trip every record type between normalized models and fake `CKRecord` values.
+- [x] Reject missing required fields, wrong types, unsupported schema versions, oversized payloads, and invalid IDs.
+- [x] Verify deterministic record-name generation for repeated inputs.
+- [x] Verify records and field names use only neutral internal terminology.
 
 **Exit criterion**
 
-- [ ] Record contracts are versioned, size-safe, deterministic, and covered by codec tests.
+- [x] Record contracts are versioned, size-safe, deterministic, and covered by codec tests.
 
 ### Task 9 — Configure the CloudKit Development Container and Security Model
 
@@ -209,15 +230,15 @@
 
 **Work**
 
-- [ ] Add the neutral iCloud container entitlement and CloudKit capability to the app.
-- [ ] Retain the remote-notification background mode if required by the chosen update mechanism.
-- [ ] Create record types and indexes in the Development environment.
-- [ ] Configure public catalog records as world-readable and writable only by the developer/loader role.
-- [ ] Document Development-versus-Production environment selection and prohibit automated Production writes.
+- [x] Add the neutral iCloud container entitlement and CloudKit capability to the app.
+- [x] Retain the remote-notification background mode if required by the chosen update mechanism.
+- [x] Create record types and indexes in the Development environment.
+- [x] Keep `_world` read-only and document the authenticated Development write role used for loader publication.
+- [x] Document Development-versus-Production environment selection and prohibit automated Production writes.
 
 **Tests**
 
-- [ ] From a signed development build, read a harmless probe record from the public database.
+- [x] From a signed development build, read a harmless probe record from the public database.
 - [ ] Verify a signed-out device can read the public probe.
 - [ ] Verify the production app client cannot create, change, or delete a public catalog record.
 - [ ] Verify a test process cannot resolve or mutate the Production environment.
@@ -225,6 +246,8 @@
 **Exit criterion**
 
 - [ ] Public Development reads work, client writes are denied, and security roles/indexes are documented.
+
+**Current gate:** A signed-in connected iPad successfully read and decoded the Development manifest and loaded the full first-30 catalog. The signed-out-device read remains untested. Authenticated Development Create/Write is intentionally still enabled for later loader runs, so the client-write-denial portion is not yet satisfied. Production remains untouched.
 
 ## Phase C — Build the Controlled Catalog Loader
 
@@ -234,26 +257,26 @@
 
 **Work**
 
-- [ ] Create a separate, non-shipping command-line target or package.
-- [ ] Add commands: `seed --range`, `sync --range`, `sync --all`, `validate`, and `dry-run`.
-- [ ] Keep the iOS app credential-free: public CloudKit reads use signed entitlements, and the creature-data API requires no key.
-- [ ] For local loader runs, read the optional card-source API key, CloudKit server-to-server key ID, and external private-key path from macOS Keychain under a loader-specific service name.
-- [ ] Support runtime environment-variable overrides for CI, where values come from the CI platform's encrypted secret store. Permit `.env.local` only as a gitignored, owner-readable local fallback.
-- [ ] Keep the CloudKit private signing-key file outside the repository. Never store secrets in source, plist, xcconfig, UserDefaults, SwiftData, CloudKit records, fixtures, logs, checkpoints, reports, or app bundles.
-- [ ] Add structured exit codes and machine-readable run reports.
+- [x] Create a separate, non-shipping command-line target or package.
+- [x] Add commands: `seed --range`, `sync --range`, `sync --all`, `validate`, and `dry-run`.
+- [x] Keep the iOS app credential-free: public CloudKit reads use signed entitlements, and the creature-data API requires no key.
+- [x] For local loader runs, read the optional card-source API key, CloudKit server-to-server key ID, and external private-key path from a gitignored, owner-only `.env.local` file.
+- [x] Support runtime environment-variable overrides for CI, where values come from the CI platform's encrypted secret store.
+- [x] Keep the CloudKit private signing-key file outside the repository. Never store secrets in source, plist, xcconfig, UserDefaults, SwiftData, CloudKit records, fixtures, logs, checkpoints, reports, or app bundles.
+- [x] Add structured exit codes and machine-readable run reports.
 
 **Tests**
 
-- [ ] Verify each command parses valid arguments and rejects invalid/missing ranges.
-- [ ] Verify missing secrets produce a clear preflight error before any network call.
-- [ ] Verify local secret retrieval uses Keychain and CI retrieval accepts process-injected values without writing them to disk.
-- [ ] Verify `.env` and secret-bearing `.env.*`, private-key, and credential-file patterns are ignored; explicitly allow only a safe `.env.example` containing variable names and placeholders, never values.
-- [ ] Verify logs redact injected test secrets.
-- [ ] Verify the iOS dependency graph and built app contain no loader module.
+- [x] Verify each command parses valid arguments and rejects invalid/missing ranges.
+- [x] Verify missing secrets produce a clear preflight error before any network call.
+- [x] Verify local config is owner-only and CI retrieval accepts process-injected values without writing them to disk.
+- [x] Verify `.env` and secret-bearing `.env.*`, private-key, and credential-file patterns are ignored; explicitly allow only a safe `.env.example` containing variable names and placeholders, never values.
+- [x] Verify logs redact injected test secrets.
+- [x] Verify the iOS dependency graph and built app contain no loader module.
 
 **Exit criterion**
 
-- [ ] The loader starts, validates configuration safely, and has no path into the shipping binary.
+- [x] The loader starts, validates configuration safely, and has no path into the shipping binary.
 
 ### Task 11 — Implement Upstream Clients, Pagination, and Rate Limiting
 
@@ -261,23 +284,23 @@
 
 **Work**
 
-- [ ] Implement loader adapters for creature/species, form, move, encounter, generation/type, evolution, card-search, and card-detail endpoints.
-- [ ] Add bounded concurrency per provider, configurable minimum request intervals, pagination, cancellation, timeouts, and response validation.
-- [ ] Honor `Retry-After` and provider limit headers where available.
-- [ ] Add bounded exponential backoff with jitter for transient failures; never retry permanent validation failures.
-- [ ] Coalesce identical requests and deduplicate stable source IDs.
+- [x] Implement loader adapters for creature/species, form, move, encounter, generation/type, evolution, card-search, and card-detail endpoints.
+- [x] Add bounded concurrency per provider, configurable minimum request intervals, pagination, cancellation, timeouts, and response validation.
+- [x] Honor `Retry-After` and provider limit headers where available.
+- [x] Add bounded exponential backoff with jitter for transient failures; never retry permanent validation failures.
+- [x] Coalesce identical requests and deduplicate stable source IDs.
 
 **Tests**
 
-- [ ] Use a stub transport to verify request paths, parameters, headers, and pagination cursors.
-- [ ] Simulate 429, timeout, connection loss, 4xx, 5xx, malformed JSON, and partial-page failures.
-- [ ] Verify minimum intervals and concurrency ceilings with a deterministic test clock.
-- [ ] Verify cancellation stops pending retries.
-- [ ] Verify all pages are consumed exactly once and duplicates are removed.
+- [x] Use a stub transport to verify request paths, parameters, headers, and pagination cursors.
+- [x] Simulate 429, timeout, connection loss, 4xx, 5xx, malformed JSON, and partial-page failures.
+- [x] Verify minimum intervals and concurrency ceilings with a deterministic test clock.
+- [x] Verify cancellation stops pending retries.
+- [x] Verify all pages are consumed exactly once and duplicates are removed.
 
 **Exit criterion**
 
-- [ ] The loader can fetch complete normalized source datasets without violating configured limits.
+- [x] The loader can fetch complete normalized source datasets without violating configured limits.
 
 ### Task 12 — Implement Catalog Normalization and Referential Validation
 
@@ -285,24 +308,24 @@
 
 **Work**
 
-- [ ] Join creature, species, form, move, encounter, evolution, and card data by stable source IDs.
-- [ ] Complete an evolution chain even when some members fall outside the requested seed range.
-- [ ] Relate cards by the provider’s national-index field rather than name matching.
-- [ ] Sanitize all stored text and prohibit raw payload persistence.
-- [ ] Calculate deterministic content hashes after normalization.
-- [ ] Validate required images/URLs, IDs, evolution references, card relationships, schema version, and payload size.
+- [x] Join creature, species, form, move, encounter, evolution, and card data by stable source IDs.
+- [x] Complete an evolution chain even when some members fall outside the requested seed range.
+- [x] Relate cards by the provider’s national-index field rather than name matching.
+- [x] Sanitize all stored text and prohibit raw payload persistence.
+- [x] Calculate deterministic content hashes after normalization.
+- [x] Validate required images/URLs, IDs, evolution references, card relationships, schema version, and payload size.
 
 **Tests**
 
-- [ ] Normalize linear, branching, no-evolution, alternate-form, missing-description, and missing-image fixtures.
-- [ ] Verify one shared evolution chain is emitted once for multiple requested members.
-- [ ] Verify unrelated cards are excluded and multi-creature cards link to every relevant entry.
-- [ ] Verify identical semantic input produces the same content hash regardless of source ordering.
-- [ ] Verify unsafe text or dangling references block publication.
+- [x] Normalize linear, branching, no-evolution, alternate-form, missing-description, and missing-image fixtures.
+- [x] Verify one shared evolution chain is emitted once for multiple requested members.
+- [x] Verify unrelated cards are excluded and multi-creature cards link to every relevant entry.
+- [x] Verify identical semantic input produces the same content hash regardless of source ordering.
+- [x] Verify unsafe text or dangling references block publication.
 
 **Exit criterion**
 
-- [ ] Every normalized catalog batch is deterministic, internally complete, sanitized, and valid before upload.
+- [x] Every normalized catalog batch is deterministic, internally complete, sanitized, and valid before upload.
 
 ### Task 13 — Implement Idempotent Public CloudKit Writes
 
@@ -310,23 +333,25 @@
 
 **Work**
 
-- [ ] Authenticate through CloudKit Web Services with a server-to-server key.
-- [ ] Fetch existing hashes and skip unchanged records.
-- [ ] Upsert deterministic record IDs in bounded batches.
-- [ ] Handle partial batch failures and retry safe individual records.
-- [ ] Save a local checkpoint after each committed batch.
-- [ ] Publish `CatalogManifest` last and never point clients at a partial catalog version.
+- [x] Authenticate through CloudKit Web Services with a server-to-server key.
+- [x] Fetch existing hashes and skip unchanged records.
+- [x] Upsert deterministic record IDs in bounded batches.
+- [x] Handle partial batch failures and retry safe individual records.
+- [x] Save a local checkpoint after each committed batch.
+- [x] Publish `CatalogManifest` last and never point clients at a partial catalog version.
 
 **Tests**
 
-- [ ] Use a fake CloudKit service to test create, update, unchanged skip, conflict, throttle, partial failure, and retry exhaustion.
-- [ ] Interrupt after a committed batch, resume, and verify no duplicate upstream fetch or public record.
-- [ ] Verify a failed data batch leaves the previous manifest active.
-- [ ] Verify the manifest is the final write in every successful run.
+- [x] Use a fake CloudKit service to test create, update, unchanged skip, conflict, throttle, partial failure, and retry exhaustion.
+- [x] Interrupt after a committed batch, resume, and verify no duplicate upstream fetch or public record.
+- [x] Verify a failed data batch leaves the previous manifest active.
+- [x] Verify the manifest is the final write in every successful run.
 
 **Exit criterion**
 
-- [ ] Loader writes are resumable, idempotent, partial-failure safe, and manifest-gated.
+- [x] Loader writes are resumable, idempotent, partial-failure safe, and manifest-gated.
+
+**Verification evidence:** Live Development authentication and publication succeeded. CloudKit hash lookup is chunked to 100 identifiers, record writes use bounded 100-record batches, and the unchanged first-30 rerun produced zero writes.
 
 ### Task 14 — Seed and Validate Creature Indexes 1–30
 
@@ -334,11 +359,11 @@
 
 **Work**
 
-- [ ] Run the loader in Development with `seed --range 1...30`.
-- [ ] Publish 30 complete creature profiles.
-- [ ] Publish every unique complete evolution chain referenced by those entries, including required out-of-range family members.
-- [ ] Publish all related cards from every API result page.
-- [ ] Publish a `testing` manifest with exact counts and supported range.
+- [x] Run the loader in Development with `seed --range 1...30`.
+- [x] Publish 30 complete creature profiles.
+- [x] Publish every unique complete evolution chain referenced by those entries, including required out-of-range family members.
+- [x] Publish all related cards from every API result page.
+- [x] Publish a `testing` manifest with exact counts and supported range.
 - [ ] Save the run report and projected public storage/transfer footprint.
 
 **Tests**
@@ -347,11 +372,13 @@
 - [ ] Confirm exactly 30 primary creature entries and no duplicate source IDs.
 - [ ] Verify each primary entry resolves its evolution chain and related cards.
 - [ ] Compare manifest counts with actual CloudKit query counts.
-- [ ] Rerun the unchanged seed and verify all data records are skipped.
+- [x] Rerun the unchanged seed and verify all data records are skipped.
 
 **Exit criterion**
 
 - [ ] The first-30 shared catalog is complete, reproducible, validated, and ready for client integration.
+
+**Run evidence (September 5, 2026):** Initial successful run reported `creatures=30`, `evolutions=12`, `cards=1040`, `written=1052`, and `skipped=30`. The unchanged rerun reported `skipped=1082` and `written=0`. Remaining work is a real Development `validate` implementation/run, independent CloudKit query counts, per-record relationship resolution, and the footprint report; do not infer those checks solely from the successful seed.
 
 ## Phase D — Build the Client Data Path
 
@@ -361,21 +388,21 @@
 
 **Work**
 
-- [ ] Implement `PublicCatalogStore` over `CKContainer.publicCloudDatabase`.
-- [ ] Read the deterministic manifest, fetch records by ID, execute indexed queries, select desired keys, and follow cursors.
-- [ ] Map CloudKit failures into typed app errors.
-- [ ] Coalesce identical requests and apply bounded transient retries.
-- [ ] Expose no mutation interface to application features.
+- [x] Implement `PublicCatalogStore` over `CKContainer.publicCloudDatabase`.
+- [x] Read the deterministic manifest, fetch records by ID, execute indexed queries, select desired keys, and follow cursors.
+- [x] Map CloudKit failures into typed app errors.
+- [x] Coalesce identical requests and apply bounded transient retries.
+- [x] Expose no mutation interface to application features.
 
 **Tests**
 
-- [ ] Test manifest, record-ID, query, cursor, desired-key, empty, malformed, throttle, offline, cancellation, and partial-result behavior with a fake database.
-- [ ] Verify an unsupported catalog schema returns an upgrade-required state.
-- [ ] Compile-time test that feature code cannot call save/delete through the store protocol.
+- [x] Test manifest, record-ID, query, cursor, desired-key, empty, malformed, throttle, offline, cancellation, and partial-result behavior with a fake database.
+- [x] Verify an unsupported catalog schema returns an upgrade-required state.
+- [x] Compile-time test that feature code cannot call save/delete through the store protocol.
 
 **Exit criterion**
 
-- [ ] The app has a tested, read-only, provider-independent public catalog interface.
+- [x] The app has a tested, read-only, provider-independent public catalog interface.
 
 ### Task 16 — Implement the Multi-Level Catalog Coordinator
 
@@ -383,26 +410,26 @@
 
 **Work**
 
-- [ ] Implement the fixed read order: memory, local SwiftData, public CloudKit.
-- [ ] Render valid local data immediately, then compare local/public manifests.
-- [ ] Download only missing or changed records and persist successful batches locally.
-- [ ] Restrict visible content to the manifest’s supported range.
-- [ ] Provide stale-but-usable, refreshing, empty-install, offline, and incompatible-schema states.
-- [ ] Ensure Release has no upstream API fallback.
+- [x] Implement the fixed read order: memory, local SwiftData, public CloudKit.
+- [x] Render valid local data immediately, then compare local/public manifests.
+- [x] Download only missing or changed records and persist successful batches locally.
+- [x] Restrict visible content to the manifest’s supported range.
+- [x] Provide stale-but-usable, refreshing, empty-install, offline, and incompatible-schema states.
+- [x] Ensure Release has no upstream API fallback.
 
 **Tests**
 
-- [ ] Cold install: load from public CloudKit and populate SwiftData.
-- [ ] Warm launch: render from SwiftData without waiting for CloudKit.
-- [ ] Updated manifest: fetch only records whose hashes changed.
-- [ ] Offline warm launch: display local data.
-- [ ] Offline empty install: show recoverable service state.
-- [ ] Failed refresh: keep last valid local batch.
-- [ ] Verify index 31 is unavailable while the test manifest supports only 1–30.
+- [x] Cold install: load from public CloudKit and populate SwiftData.
+- [x] Warm launch: render from SwiftData without waiting for CloudKit.
+- [x] Updated manifest: fetch only records whose hashes changed.
+- [x] Offline warm launch: display local data.
+- [x] Offline empty install: show recoverable service state.
+- [x] Failed refresh: keep last valid local batch.
+- [x] Verify index 31 is unavailable while the test manifest supports only 1–30.
 
 **Exit criterion**
 
-- [ ] Catalog data loads quickly, works offline after first use, refreshes incrementally, and never contacts upstream APIs.
+- [x] Catalog data loads quickly, works offline after first use, refreshes incrementally, and never contacts upstream APIs.
 
 ### Task 17 — Implement Image Loading and Device Caching
 
@@ -410,21 +437,21 @@
 
 **Work**
 
-- [ ] Implement `ImageRepository` with memory caching, configured `URLCache`, request coalescing, cancellation, and small/large image selection.
-- [ ] Use small images in grids and large images only for detail/viewer states.
-- [ ] Add deterministic placeholders and prevent layout jumps.
-- [ ] Keep source images outside public CloudKit assets in the initial build.
+- [x] Implement `ImageRepository` with memory caching, configured `URLCache`, request coalescing, cancellation, and small/large image selection.
+- [x] Use small images in grids and large images only for detail/viewer states.
+- [x] Add deterministic placeholders and prevent layout jumps.
+- [x] Keep source images outside public CloudKit assets in the initial build.
 
 **Tests**
 
-- [ ] Verify one network request serves concurrent identical image consumers.
-- [ ] Verify cancellation, corrupt data, missing URL, HTTP failure, memory eviction, and disk-cache reuse.
-- [ ] Verify grids never request high-resolution card images.
-- [ ] Verify cached images display during offline warm launches.
+- [x] Verify one network request serves concurrent identical image consumers.
+- [x] Verify cancellation, corrupt data, missing URL, HTTP failure, memory eviction, and disk-cache reuse.
+- [x] Verify grids never request high-resolution card images.
+- [x] Verify cached images display during offline warm launches.
 
 **Exit criterion**
 
-- [ ] Artwork loading is efficient, cancellable, cache-backed, and layout-stable.
+- [x] Artwork loading is efficient, cancellable, cache-backed, and layout-stable.
 
 ## Phase E — Build the Native Experience Incrementally
 
@@ -434,10 +461,10 @@
 
 **Work**
 
-- [ ] Replace the starter content with a root feature state machine.
-- [ ] Add dark-default, light, and follow-system appearance using `AppStorage`.
-- [ ] Add root loading, empty-install, incompatible-schema, CloudKit-unavailable, and retry states using reference styling.
-- [ ] Inject dependencies once through `AppDependencies`.
+- [x] Replace the starter content with a root feature state machine.
+- [x] Add dark-default, light, and follow-system appearance using `AppStorage`.
+- [x] Add root loading, empty-install, incompatible-schema, CloudKit-unavailable, and retry states using reference styling.
+- [x] Inject dependencies once through `AppDependencies`.
 
 **Tests**
 
@@ -457,8 +484,8 @@
 
 - [ ] Implement the complete Electric Burst palette, spacing, radii, typography, shadows, glass materials, inner highlights, chips, buttons, orbital traces, ambient glow, and focus treatment.
 - [ ] Bundle Sora, Hanken Grotesk, and Space Grotesk with license notices.
-- [ ] Build reusable branded header, icon button, glass tile, gesture pill, type chip, data panel, scrim, panel grip, loading card, and error card.
-- [ ] Ensure no design constants are duplicated in feature views.
+- [x] Build reusable branded header, icon button, glass tile, gesture pill, type chip, data panel, scrim, panel grip, loading card, and error card.
+- [x] Ensure no design constants are duplicated in feature views.
 
 **Tests**
 
@@ -476,9 +503,9 @@
 
 **Work**
 
-- [ ] Build the launcher header, “Choose Your Battler” copy, lazy grid, creature tiles, region indicator, ambient background, and Surprise Me control.
-- [ ] Use two columns on iPhone portrait and three on iPad/landscape.
-- [ ] Bind the grid to the manifest-supported creature summaries.
+- [x] Build the launcher header, “Choose Your Battler” copy, lazy grid, creature tiles, region indicator, ambient background, and Surprise Me control.
+- [x] Use two columns on iPhone portrait and three on iPad/landscape.
+- [x] Bind the grid to the manifest-supported creature summaries.
 - [ ] Restore accessibility focus and scroll position when returning from detail.
 
 **Tests**
@@ -498,9 +525,9 @@
 
 **Work**
 
-- [ ] Make the region indicator open the reference-derived search/filter layer.
-- [ ] Add name, national-index, generation, and type filtering with clear/reset.
-- [ ] Keep filtering local over the cached manifest range.
+- [x] Make the region indicator open the reference-derived search/filter layer.
+- [x] Add name, national-index, generation, and type filtering with clear/reset.
+- [x] Keep filtering local over the cached manifest range.
 - [ ] Implement Surprise Me using the 480 ms rearrangement and rotating sparkle; guarantee a changed visible order when possible.
 
 **Tests**
@@ -521,9 +548,9 @@
 **Work**
 
 - [ ] Implement launcher-to-detail and reverse transitions with the specified 300/420 ms behavior.
-- [ ] Build the branded detail header, artwork area, metadata, compact Field Guide panel, controls, and page indicator.
-- [ ] Implement interactive horizontal drag with 82% damping, 6% scale reduction, neighbor opacity, 22% threshold, and fast-flick rule.
-- [ ] Add 460 ms settling and 220 ms boundary bump.
+- [x] Build the branded detail header, artwork area, metadata, compact Field Guide panel, controls, and page indicator.
+- [x] Implement interactive horizontal drag with 82% damping, 6% scale reduction, neighbor opacity, 22% threshold, and fast-flick rule.
+- [x] Add 460 ms settling and 220 ms boundary bump.
 - [ ] Prefetch adjacent summaries/images without fetching the entire catalog.
 
 **Tests**
@@ -544,10 +571,10 @@
 
 **Work**
 
-- [ ] Open the encyclopedia by tapping the compact Field Guide panel.
-- [ ] Present all normalized profile sections with lazy containers.
+- [x] Open the encyclopedia by tapping the compact Field Guide panel.
+- [x] Present all normalized profile sections with lazy containers.
 - [ ] Load move details and encounters from the shared/local catalog only when opened.
-- [ ] Omit unavailable values cleanly and use neutral factual copy.
+- [x] Omit unavailable values cleanly and use neutral factual copy.
 - [ ] Add section-level loading/error states without replacing the whole profile.
 
 **Tests**
@@ -593,7 +620,7 @@
 - [ ] Implement downward interactive opening with the same progressive background treatment and thresholds.
 - [ ] Apply reference panel heights, close interactions, card-grid entrance timing, and pagination behavior.
 - [ ] Query cards by cached national-index relationships.
-- [ ] Display small artwork, name, set, collector number, rarity, type, and HP.
+- [x] Display small artwork, name, set, collector number, rarity, type, and HP.
 - [ ] Add empty, partial-page, stale, and retry states.
 
 **Tests**
@@ -615,8 +642,8 @@
 **Work**
 
 - [ ] Implement the 180 ms backdrop fade and 340 ms card entrance from 24 points below at 0.82 scale.
-- [ ] Present static high-resolution artwork without tilt, glare, foil simulation, favorites, or collection controls.
-- [ ] Add the full card information layer with normalized available fields.
+- [x] Present static high-resolution artwork without tilt, glare, foil simulation, favorites, or collection controls.
+- [x] Add the full card information layer with normalized available fields.
 - [ ] Restore focus to the originating card on every close path.
 
 **Tests**

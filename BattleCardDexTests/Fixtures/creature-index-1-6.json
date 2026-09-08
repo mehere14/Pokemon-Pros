@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "creatures": [
+    { "id": 1, "name": "seedling-one", "displayName": "Seedling One", "types": ["leaf", "toxin"] },
+    { "id": 2, "name": "seedling-two", "displayName": "Seedling Two", "types": ["leaf", "toxin"] },
+    { "id": 3, "name": "seedling-three", "displayName": "Seedling Three", "types": ["leaf", "toxin"] },
+    { "id": 4, "name": "ember-one", "displayName": "Ember One", "types": ["flame"] },
+    { "id": 5, "name": "ember-two", "displayName": "Ember Two", "types": ["flame"] },
+    { "id": 6, "name": "ember-three", "displayName": "Ember Three", "types": ["flame", "air"] }
+  ]
+}

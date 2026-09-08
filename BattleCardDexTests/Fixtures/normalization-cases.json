@@ -1,0 +1,145 @@
+{
+  "creature": {
+    "id": 25,
+    "name": "  Spark Mouse  ",
+    "height": 4,
+    "weight": 60,
+    "base_experience": null,
+    "types": [
+      { "slot": 1, "type": { "name": "ELECTRIC", "url": "https://example.invalid/type/13/" } },
+      { "slot": 2, "type": { "name": "electric", "url": null } }
+    ],
+    "abilities": [
+      { "ability": { "name": "Static Charge", "url": "https://example.invalid/ability/9/" }, "is_hidden": false },
+      { "ability": { "name": "Lightning Rod", "url": "https://example.invalid/ability/31/" }, "is_hidden": true }
+    ],
+    "stats": [
+      { "base_stat": 35, "stat": { "name": "hp", "url": null } },
+      { "base_stat": 55, "stat": { "name": "attack", "url": null } },
+      { "base_stat": 40, "stat": { "name": "defense", "url": null } },
+      { "base_stat": 50, "stat": { "name": "special-attack", "url": null } },
+      { "base_stat": 50, "stat": { "name": "special-defense", "url": null } },
+      { "base_stat": 90, "stat": { "name": "speed", "url": null } }
+    ],
+    "moves": [
+      {
+        "move": { "name": "Quick Attack", "url": "https://example.invalid/move/98/" },
+        "version_group_details": [
+          { "move_learn_method": { "name": "Level Up", "url": null }, "version_group": { "name": "Red Blue", "url": null } },
+          { "move_learn_method": { "name": "Machine", "url": null }, "version_group": { "name": "Yellow", "url": null } }
+        ]
+      }
+    ],
+    "unknown_future_field": { "ignored": true }
+  },
+  "missingCreature": {
+    "id": 26,
+    "name": "Missing Optional",
+    "types": [],
+    "extra": 42
+  },
+  "evolution": {
+    "id": 10,
+    "chain": {
+      "species": { "name": "Root Form", "url": "https://example.invalid/species/1/" },
+      "evolution_details": [],
+      "evolves_to": [
+        {
+          "species": { "name": "Day Branch", "url": "https://example.invalid/species/2/" },
+          "evolution_details": [
+            {
+              "trigger": { "name": "level-up", "url": null },
+              "min_level": 20,
+              "item": { "name": "Sun Stone", "url": null },
+              "held_item": { "name": "Bright Charm", "url": null },
+              "trade_species": { "name": "Trade Friend", "url": null },
+              "min_happiness": 160,
+              "min_affection": 2,
+              "min_beauty": 170,
+              "time_of_day": "DAY",
+              "location": { "name": "Moss Rock", "url": null },
+              "relative_physical_stats": 1,
+              "gender": 1,
+              "known_move": { "name": "Ancient Song", "url": null },
+              "known_move_type": { "name": "Fairy", "url": null },
+              "party_species": { "name": "Companion", "url": null },
+              "party_type": { "name": "Dark", "url": null },
+              "needs_overworld_rain": true,
+              "turn_upside_down": true,
+              "unknown_condition": "ignored"
+            }
+          ],
+          "evolves_to": []
+        },
+        {
+          "species": { "name": "Night Branch", "url": "https://example.invalid/species/3/" },
+          "evolution_details": [
+            { "trigger": { "name": "trade", "url": null }, "min_level": null, "gender": 2 }
+          ],
+          "evolves_to": []
+        }
+      ]
+    },
+    "future": null
+  },
+  "form": {
+    "id": 10025,
+    "name": "Spark Mouse Costume",
+    "is_default": false,
+    "types": [{ "type": { "name": "Electric", "url": null } }],
+    "sprites": { "front_default": "https://images.invalid/form.png", "future_sprite": null }
+  },
+  "move": {
+    "id": 98,
+    "name": "Quick Attack",
+    "type": { "name": "Normal", "url": null },
+    "damage_class": { "name": "Physical", "url": null },
+    "power": 40,
+    "accuracy": 100,
+    "pp": 30,
+    "priority": 1,
+    "effect_entries": [
+      { "effect": "This move acts first.", "language": { "name": "en", "url": null } },
+      { "effect": "Texte non sélectionné.", "language": { "name": "fr", "url": null } }
+    ]
+  },
+  "encounters": [
+    {
+      "location_area": { "name": "Forest Path", "url": null },
+      "version_details": [
+        {
+          "version": { "name": "Red Blue", "url": null },
+          "max_chance": 30,
+          "encounter_details": [
+            { "min_level": 3, "max_level": 5, "chance": 20 },
+            { "min_level": 2, "max_level": 6, "chance": 10 }
+          ]
+        }
+      ]
+    }
+  ],
+  "card": {
+    "id": "set-001",
+    "name": "Spark Mouse",
+    "nationalPokedexNumbers": [25, 25, -1],
+    "set": { "id": "base", "name": "Base Set", "ignored": true },
+    "number": "001/100",
+    "rarity": null,
+    "types": ["Electric", "electric"],
+    "hp": "60",
+    "images": { "small": "https://images.invalid/small.png", "large": "not a url" },
+    "subtypes": ["Basic"],
+    "rules": ["A neutral rule."],
+    "artist": null,
+    "flavorText": "A neutral description.",
+    "regulationMark": null,
+    "legalities": { "Expanded": "Legal" },
+    "abilities": [{ "name": "Charge", "type": "Ability", "text": "Stores energy." }],
+    "attacks": [{ "name": "Spark", "text": "Deals damage." }],
+    "weaknesses": [{ "type": "Fighting", "value": "×2" }],
+    "resistances": [{ "type": "Metal", "value": "-30" }],
+    "retreatCost": ["Colorless", "colorless"],
+    "evolvesFrom": "Small Mouse",
+    "prices": { "must": "be ignored" }
+  }
+}

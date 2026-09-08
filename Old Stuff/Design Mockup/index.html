@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#171021" />
+    <meta
+      name="description"
+      content="Interactive iPhone and iPad design mockups for Pokémon Pros."
+    />
+    <title>Pokémon Pros — Interactive Design Mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <main class="showcase">
+      <header class="showcase__intro">
+        <div>
+          <p class="eyebrow">Interactive product study · v1.2</p>
+          <h1>Pokémon <span>Pros</span></h1>
+        </div>
+        <p class="showcase__lede">
+          Meet the original partners. Drag sideways to explore, pull down for
+          cards, swipe up to trace each evolution, or turn landscape for a
+          detailed Pokédex scan.
+        </p>
+      </header>
+
+      <section class="device-grid" aria-label="Phone and tablet mockups">
+        <article class="device-study" style="--entrance-order: 0">
+          <div class="study-label"><span>iPhone</span><span>Light</span></div>
+          <div class="device device--phone" data-device="phone" data-theme="light"></div>
+        </article>
+        <article class="device-study" style="--entrance-order: 1">
+          <div class="study-label"><span>iPhone</span><span>Dark</span></div>
+          <div class="device device--phone" data-device="phone" data-theme="dark"></div>
+        </article>
+        <article class="device-study device-study--landscape device-study--phone-landscape" style="--entrance-order: 2">
+          <div class="study-label"><span>iPhone · Landscape</span><span>Light · Pokédex</span></div>
+          <div class="device device--phone device--landscape device--phone-landscape" data-device="phone" data-orientation="landscape" data-theme="light"></div>
+        </article>
+        <article class="device-study device-study--tablet" style="--entrance-order: 3">
+          <div class="study-label"><span>iPad</span><span>Light</span></div>
+          <div class="device device--tablet" data-device="tablet" data-theme="light"></div>
+        </article>
+        <article class="device-study device-study--tablet" style="--entrance-order: 4">
+          <div class="study-label"><span>iPad</span><span>Dark</span></div>
+          <div class="device device--tablet" data-device="tablet" data-theme="dark"></div>
+        </article>
+        <article class="device-study device-study--landscape device-study--tablet-landscape" style="--entrance-order: 5">
+          <div class="study-label"><span>iPad · Landscape</span><span>Light · Pokédex</span></div>
+          <div class="device device--tablet device--landscape device--tablet-landscape" data-device="tablet" data-orientation="landscape" data-theme="light"></div>
+        </article>
+      </section>
+    </main>
+
+    <template id="device-template">
+      <div class="device__bezel">
+        <section class="app-shell" data-pokemon-index="0" data-panel="home" data-view="launcher">
+          <div class="app-ambient" aria-hidden="true"></div>
+
+          <section class="launcher-layer" aria-label="Choose a Pokémon">
+            <header class="app-bar launcher-bar">
+              <div class="brand-mark" aria-label="Pokémon Pros home">
+                <span class="brand-mark__bolt" aria-hidden="true">ϟ</span>
+                <span>PROS</span>
+              </div>
+              <p class="region"><span aria-hidden="true"></span>Kanto · 001—006</p>
+              <span class="icon-button app-state" aria-hidden="true">✦</span>
+            </header>
+            <div class="launcher-heading">
+              <p class="eyebrow">Kanto field guide</p>
+              <h2>Choose your Pokémon</h2>
+              <p>Select a partner to open its complete profile.</p>
+            </div>
+            <div class="pokemon-grid" aria-label="Pokémon collection"></div>
+            <div class="launcher-actions">
+              <button class="surprise-button" type="button">
+                <span aria-hidden="true">✦</span> Surprise me
+              </button>
+              <span class="shuffle-status visually-hidden" aria-live="polite"></span>
+            </div>
+          </section>
+
+          <section class="home-layer" aria-label="Pokémon browser" aria-hidden="true">
+            <header class="app-bar">
+              <div class="app-bar__leading">
+                <button class="nav-back" type="button" aria-label="Back to all Pokémon">←</button>
+                <div class="brand-mark" aria-label="Pokémon Pros">
+                  <span class="brand-mark__bolt" aria-hidden="true">ϟ</span>
+                  <span>PROS</span>
+                </div>
+              </div>
+              <p class="region"><span aria-hidden="true"></span>Kanto · 001—006</p>
+              <span class="icon-button app-state" aria-hidden="true">✦</span>
+            </header>
+
+            <button class="gesture-pill gesture-pill--cards" type="button" data-open-panel="cards" aria-label="Open card collection">
+              <span>Pull down</span><b>Cards</b><i aria-hidden="true">⌄</i>
+            </button>
+
+            <div class="carousel" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Choose a Pokémon">
+              <div class="carousel__viewport">
+                <div class="carousel__track"></div>
+              </div>
+              <button class="carousel-arrow carousel-arrow--previous" type="button" aria-label="Previous Pokémon">←</button>
+              <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next Pokémon">→</button>
+            </div>
+
+            <section class="pokemon-copy" aria-live="polite">
+              <div class="pokemon-copy__number"></div>
+              <h2></h2>
+              <div class="pokemon-copy__meta">
+                <span class="type-chip"></span>
+                <span class="stage-label"></span>
+              </div>
+              <p class="pokemon-copy__description"></p>
+              <section class="pokedex-data" aria-label="Pokédex data">
+                <header class="pokedex-data__header">
+                  <span>Pokédex data</span>
+                  <span class="scan-state"><i aria-hidden="true"></i>Live scan</span>
+                </header>
+                <dl>
+                  <div><dt>Height</dt><dd data-stat="height"></dd></div>
+                  <div><dt>Weight</dt><dd data-stat="weight"></dd></div>
+                  <div><dt>Category</dt><dd data-stat="category"></dd></div>
+                  <div><dt>Ability</dt><dd data-stat="ability"></dd></div>
+                  <div><dt>Gender</dt><dd data-stat="gender"></dd></div>
+                  <div class="weakness-stat"><dt>Weakness</dt><dd data-stat="weakness"></dd></div>
+                </dl>
+              </section>
+            </section>
+
+            <div class="carousel-dots" role="group" aria-label="Select Pokémon"></div>
+
+            <button class="gesture-pill gesture-pill--evolution" type="button" data-open-panel="evolution" aria-label="Open evolution chain">
+              <i aria-hidden="true">⌃</i><span>Swipe up</span><b>Evolutions</b>
+            </button>
+          </section>
+
+          <section class="panel panel--cards" aria-hidden="true" aria-label="Featured card collection">
+            <header class="panel__header">
+              <div>
+                <p class="eyebrow">Curated collection</p>
+                <h3>Featured cards</h3>
+              </div>
+              <button class="panel-close" type="button" data-close-panel aria-label="Close cards">×</button>
+            </header>
+            <p class="panel__intro">Four electric favourites, selected for this interactive study.</p>
+            <div class="card-grid"></div>
+            <button class="panel-grip panel-grip--top" type="button" data-close-panel aria-label="Swipe up to close cards"><span></span>Swipe up to close</button>
+          </section>
+
+          <section class="panel panel--evolution" aria-hidden="true" aria-label="Evolution chain">
+            <button class="panel-grip panel-grip--bottom" type="button" data-close-panel aria-label="Swipe down to close evolution"><span></span>Swipe down to close</button>
+            <header class="panel__header">
+              <div>
+                <p class="eyebrow">Evolution path</p>
+                <h3 class="evolution-title"></h3>
+              </div>
+              <button class="panel-close" type="button" data-close-panel aria-label="Close evolutions">×</button>
+            </header>
+            <div class="evolution-chain"></div>
+            <p class="evolution-note">Select a stage to meet that Pokémon.</p>
+          </section>
+
+          <div class="panel-scrim" data-close-panel aria-hidden="true"></div>
+
+          <div class="card-modal" role="dialog" aria-modal="true" aria-label="Magnified Pokémon card" aria-hidden="true">
+            <button class="card-modal__backdrop" type="button" data-close-card aria-label="Close card viewer"></button>
+            <div class="card-modal__content">
+              <button class="card-modal__close" type="button" data-close-card aria-label="Close card viewer">×</button>
+              <div class="card-modal__card">
+                <img alt="" />
+                <div class="card-modal__glare" aria-hidden="true"></div>
+              </div>
+              <p>Move to catch the light</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </template>
+  </body>
+</html>

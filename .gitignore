@@ -1,0 +1,18 @@
+# Local loader credentials and environment overrides.
+.env
+.env.*
+!.env.example
+
+# CloudKit and provider key material. Keep private keys outside this repository.
+*.p8
+*.pem
+*.key
+credentials/
+.loader-state/
+.loader-cache/
+secrets/
+*.credentials
+*-credentials.json
+
+# SwiftPM build output for the non-shipping loader package.
+Loader/.build/

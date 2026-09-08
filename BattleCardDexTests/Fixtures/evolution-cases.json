@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "chains": [
+    {
+      "id": "branching-1",
+      "rootID": 1,
+      "edges": [
+        { "from": 1, "to": 2, "requirement": "reaches level 16" },
+        { "from": 2, "to": 3, "requirement": "uses a sun shard" },
+        { "from": 2, "to": 5, "requirement": "friendship at dusk" }
+      ]
+    },
+    {
+      "id": "no-evolution-6",
+      "rootID": 6,
+      "edges": []
+    }
+  ]
+}
