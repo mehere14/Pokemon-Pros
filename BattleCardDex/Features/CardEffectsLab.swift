@@ -28,7 +28,7 @@ enum DebugCardEffectFamily: String, CaseIterable, Identifiable {
         case .basic: .specularSpot
         case .reverseHolo: .outsideArtworkWindow
         case .regularHolo, .cosmosHolo: .artworkWindow
-        case .amazingRare: .amazingBreakout
+        case .amazingRare: .artworkWindow
         case .radiantHolo: .radiantBurst
         case .v, .vmax, .vstar, .trainerGalleryHolo: .fullCard
         default: .fullArt
@@ -39,13 +39,61 @@ enum DebugCardEffectFamily: String, CaseIterable, Identifiable {
 enum DebugCardMaskPreset: String { case specularSpot, artworkWindow, outsideArtworkWindow, fullCard, fullArt, radiantBurst, amazingBreakout, customOverride }
 
 private enum DebugBundleImages {
+    private static var cache: [String: Image] = [:]
     static func image(named name: String) -> Image {
+        if let cached = cache[name] { return cached }
         guard let path = Bundle.main.path(forResource: name, ofType: "png"),
               let image = UIImage(contentsOfFile: path) else {
             assertionFailure("Missing Debug image resource: \(name)")
             return Image(systemName: "exclamationmark.triangle.fill")
         }
-        return Image(uiImage: image)
+        let result = Image(uiImage: image)
+        cache[name] = result
+        return result
+    }
+}
+
+extension DebugCardEffectFamily {
+    /// Bundled pattern texture sampled by `cardFinish`. Mirrors the reference CSS: basic, reverse holo,
+    /// regular holo and the V family are gradient-only; the illusion rings (FinishEtched) are Shiny Vault only.
+    var textureName: String? {
+        switch self {
+        case .cosmosHolo: "FinishCosmos"
+        case .vmax, .vmaxRainbow: "FinishVMax"
+        case .trainerGalleryHolo, .trainerFullArt, .radiantHolo: "FinishTrainer"
+        case .secretGold: "FinishGeometric"
+        case .amazingRare, .rainbowRare: "FinishGlitter"
+        case .shinyVault: "FinishEtched"
+        default: nil
+        }
+    }
+
+    /// How strongly the pattern texture is screened onto the card (0 = off). Tune here.
+    var textureStrength: Float {
+        switch self {
+        case .cosmosHolo: 0.35
+        case .amazingRare, .rainbowRare: 0.30
+        case .vmax, .vmaxRainbow, .secretGold: 0.12
+        case .trainerGalleryHolo, .trainerFullArt, .radiantHolo: 0.05
+        case .shinyVault: 0.05
+        default: 0
+        }
+    }
+
+    /// Overall gain applied to foil, sparkle, pattern and glare (1 = baseline). Tune here.
+    var intensity: Float {
+        switch self {
+        case .secretGold, .rainbowRare: 1.0
+        default: 1.8
+        }
+    }
+
+    /// 0 = cover the card; N = tile N times across (reference uses 25% tiles for glitter).
+    var textureTile: Float {
+        switch self {
+        case .amazingRare, .rainbowRare: 4
+        default: 0
+        }
     }
 }
 
@@ -170,18 +218,18 @@ private struct DebugRemoteShaderCard: View {
     var body: some View {
         Group {
             if let image {
-                ZStack {
-                    Image(uiImage: image).resizable().scaledToFit()
-                        .colorEffect(ShaderLibrary.cardFinish(
-                            .float2(size), .float2(Float(x), Float(y)),
-                            .float(Float(DebugCardEffectFamily.allCases.firstIndex(of: sample.family) ?? 0)),
-                            .float(effectsEnabled ? 1 : 0)
-                        ))
-                    if effectsEnabled {
-                        DebugFoilTextureLayer(family: sample.family, x: x, y: y)
-                    }
-                }
-                .accessibilityIdentifier("effect-artwork-loaded-\(sample.family.id)")
+                Image(uiImage: image).resizable().scaledToFit()
+                    .colorEffect(ShaderLibrary.cardFinish(
+                        .float2(size), .float2(Float(x), Float(y)),
+                        .float(Float(DebugCardEffectFamily.allCases.firstIndex(of: sample.family) ?? 0)),
+                        .float(effectsEnabled ? 1 : 0),
+                        .image(DebugBundleImages.image(named: sample.family.textureName ?? "FinishGrain")),
+                        .image(DebugBundleImages.image(named: "FinishGrain")),
+                        .float(sample.family.textureStrength),
+                        .float(sample.family.textureTile),
+                        .float(sample.family.intensity)
+                    ))
+                    .accessibilityIdentifier("effect-artwork-loaded-\(sample.family.id)")
             } else if let errorMessage {
                 ZStack {
                     Color.red.opacity(0.20)
@@ -210,81 +258,6 @@ private struct DebugRemoteShaderCard: View {
                 return
             } catch {
                 errorMessage = "Artwork failed to load\n\(sample.cardID)"
-            }
-        }
-    }
-}
-
-private struct DebugFoilTextureLayer: View {
-    let family: DebugCardEffectFamily
-    let x: Double
-    let y: Double
-
-    private var primaryName: String {
-        switch family {
-        case .cosmosHolo: "FinishCosmos"
-        case .vmax, .vmaxRainbow: "FinishVMax"
-        case .trainerGalleryHolo, .trainerFullArt: "FinishTrainer"
-        case .secretGold: "FinishGeometric"
-        case .amazingRare, .rainbowRare, .shinyVault: "FinishGlitter"
-        default: "FinishEtched"
-        }
-    }
-
-    private var opacity: Double {
-        switch family {
-        case .basic: 0.10
-        case .regularHolo, .cosmosHolo: 0.32
-        case .radiantHolo, .vmaxRainbow, .rainbowRare, .secretGold: 0.46
-        default: 0.36
-        }
-    }
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                DebugBundleImages.image(named: primaryName)
-                    .resizable().scaledToFill()
-                    .scaleEffect(family == .cosmosHolo ? 1.0 : 1.55)
-                    .offset(x: (x - 0.5) * geometry.size.width * 0.24,
-                            y: (y - 0.5) * geometry.size.height * -0.20)
-                    .blendMode(family == .secretGold ? .colorDodge : .screen)
-                if family != .basic && family != .cosmosHolo {
-                    DebugBundleImages.image(named: "FinishGrain")
-                        .resizable().scaledToFill().scaleEffect(1.8)
-                        .offset(x: (x - 0.5) * geometry.size.width * -0.16,
-                                y: (y - 0.5) * geometry.size.height * 0.14)
-                        .blendMode(.softLight).opacity(0.55)
-                }
-            }
-            .opacity(opacity)
-            .mask { DebugGenericMask(preset: family.mask) }
-        }
-        .allowsHitTesting(false)
-    }
-}
-
-private struct DebugGenericMask: View {
-    let preset: DebugCardMaskPreset
-
-    var body: some View {
-        GeometryReader { geometry in
-            let art = CGRect(x: geometry.size.width * 0.08, y: geometry.size.height * 0.0985,
-                             width: geometry.size.width * 0.84, height: geometry.size.height * 0.373)
-            Canvas { context, size in
-                var path = Path()
-                switch preset {
-                case .artworkWindow:
-                    path.addRect(art)
-                case .outsideArtworkWindow:
-                    path.addRect(CGRect(origin: .zero, size: size)); path.addRect(art)
-                    context.fill(path, with: .color(.white), style: FillStyle(eoFill: true)); return
-                case .amazingBreakout:
-                    path.addRoundedRect(in: art.insetBy(dx: -size.width * 0.05, dy: -size.height * 0.04), cornerSize: CGSize(width: 12, height: 12))
-                default:
-                    path.addRect(CGRect(origin: .zero, size: size))
-                }
-                context.fill(path, with: .color(.white))
             }
         }
     }

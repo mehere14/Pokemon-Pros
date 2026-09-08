@@ -11,26 +11,39 @@ float3 finishSpectrum(float phase) {
 float finishBand(float phase, float sharpness) {
     return pow(0.5 + 0.5 * sin(phase * 6.2831853), sharpness);
 }
+// finishTex: family-specific pattern texture. grainTex: fine grain. textureStrength: how much of
+// the pattern is screened on (0 = none). textureTile: 0 = cover the card, N = repeat N times across
+// (the reference CSS uses background-size 25% for glitter, cover for everything else).
+// intensity: per-family overall gain (1 = baseline). Textures are sampled here so the mask below is the only mask.
 [[ stitchable ]] half4 cardFinish(
-    float2 position, half4 input, float2 size, float2 light, float familyValue, float enabled
+    float2 position, half4 input, float2 size, float2 light, float familyValue, float enabled,
+    texture2d<half> finishTex, texture2d<half> grainTex, float textureStrength, float textureTile,
+    float intensity
 ) {
     if (enabled < 0.5 || input.a < 0.001h) return input;
     float2 uv = position / max(size, float2(1.0));
     int family = int(familyValue);
     float2 tilt = light - 0.5;
+    constexpr sampler finishSampler(address::repeat, filter::linear);
+    float aspect = size.x / max(size.y, 1.0);
+    float2 patternDrift = tilt * float2(0.24, -0.20);
+    float2 patternUV = textureTile > 0.5
+        ? (uv + patternDrift) * textureTile
+        : 0.5 + ((uv - 0.5) + patternDrift) * float2(aspect, 1.0);
+    float2 grainUV = 0.5 + ((uv - 0.5) + tilt * float2(-0.16, 0.14)) * float2(aspect, 1.0) / 1.8;
+    half3 patternSample = finishTex.sample(finishSampler, patternUV).rgb;
+    float pattern = dot(float3(patternSample), float3(0.299, 0.587, 0.114));
+    float grainTexture = dot(float3(grainTex.sample(finishSampler, grainUV).rgb), float3(0.299, 0.587, 0.114));
     float3 base = float3(input.rgb) / float(input.a);
     float2 d = uv - light;
     float glare = exp(-dot(d * float2(1.0, 1.4), d * float2(1.0, 1.4)) * 28.0);
-    float art = smoothstep(0.08, 0.087, uv.x) * (1.0 - smoothstep(0.913, 0.92, uv.x))
-              * smoothstep(0.095, 0.102, uv.y) * (1.0 - smoothstep(0.52, 0.527, uv.y));
+    // Artwork window from the reference CSS: --clip: inset(9.85% 8% 52.85% 8%). Hard edges: no ramp.
+    const float2 artMin = float2(0.08, 0.0985);
+    const float2 artMax = float2(0.92, 0.4715);
+    float art = step(artMin.x, uv.x) * step(uv.x, artMax.x) * step(artMin.y, uv.y) * step(uv.y, artMax.y);
     float mask = 1.0;
     if (family == 1) mask = 1.0 - art;
-    if (family == 2 || family == 3) mask = art;
-    if (family == 4) {
-        float2 q = (uv - float2(0.5, 0.32)) / float2(0.48, 0.30);
-        mask = 1.0 - smoothstep(0.85, 1.0, length(q));
-    }
-    if (family >= 6) mask *= 1.0 - 0.5 * smoothstep(0.60, 0.92, uv.y);
+    if (family == 2 || family == 3 || family == 4) mask = art;
     float2 fineMotion = tilt * float2(0.34, -0.27);
     float2 reverseMotion = tilt * float2(-0.24, 0.31);
     float grainMap = finishHash(floor((uv + fineMotion) * float2(620, 860)));
@@ -59,7 +72,7 @@ float finishBand(float phase, float sharpness) {
             tint = mix(float3(0.65, 0.8, 0.9), tint, 0.45); break;
         case 2:
             foil = (0.08 + 0.34 * finishBand(uv.x * 6.0 - angle, 14.0))
-                 * (0.30 + 0.70 * etchedMap); break;
+                 * (0.65 + 0.35 * etchedMap); break;
         case 3: {
             foil = 0.10 * lobe + 0.28 * cosmosMap * finishBand(cosmosMap * 4.0 - angle, 5.0);
             for (int layer = 0; layer < 3; ++layer) {
@@ -120,12 +133,15 @@ float finishBand(float phase, float sharpness) {
     else if (family == 1 || family == 2 || family == 8 || family == 9 || family == 12 || family == 16) selectedTexture = etchedMap;
     float textureRelief = smoothstep(0.28, 0.72, selectedTexture);
     if (family > 0) {
-        foil = min(1.0, foil * 1.65 + sweep * (0.24 + textureRelief * 0.20));
-        sparkle += pow(textureRelief, 5.0) * sweep * 0.32;
+        foil = min(1.0, foil * 0.55 + sweep * (0.10 + textureRelief * 0.06));
+        sparkle += pow(textureRelief, 5.0) * sweep * 0.12;
     }
     // Screen reflection adds light locally without subtracting artwork colour.
-    float3 reflection = clamp(mask * (tint * foil + mix(tint, float3(1.0), 0.62) * sparkle)
-                             + glare * (family == 0 ? 0.36 : 0.18), 0.0, 0.82);
+    // Bundled pattern texture, screened on lightly and driven by the same mask as the procedural foil.
+    float3 patternLight = mix(tint, float3(1.0), 0.5) * pattern * textureStrength
+                        + float3(grainTexture) * textureStrength * 0.3;
+    float3 reflection = clamp(intensity * (mask * (tint * foil + mix(tint, float3(1.0), 0.62) * sparkle + patternLight)
+                             + glare * (family == 0 ? 0.22 : 0.12)), 0.0, 0.40 * max(intensity, 1.0));
     float3 result = 1.0 - (1.0 - base) * (1.0 - reflection);
     return half4(half3(result) * input.a, input.a);
 }

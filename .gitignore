@@ -16,3 +16,4 @@ secrets/
 
 # SwiftPM build output for the non-shipping loader package.
 Loader/.build/
+/build

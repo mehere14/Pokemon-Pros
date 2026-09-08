@@ -36,7 +36,8 @@ private struct CatalogHomeView: View {
     @State private var shuffleSeed = 0
     @State private var sparkleRotation = 0.0
 #if DEBUG
-    @State private var showCardEffectsLab = false
+    // Launch with BATTLE_CARD_DEX_OPEN_EFFECTS_LAB=1 to open the lab immediately (simulator screenshots).
+    @State private var showCardEffectsLab = ProcessInfo.processInfo.environment["BATTLE_CARD_DEX_OPEN_EFFECTS_LAB"] == "1"
 #endif
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AccessibilityFocusState private var focusedCreatureID: Int?
